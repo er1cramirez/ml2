@@ -24,8 +24,12 @@ conda activate mi_entorno
 
 
 ### Torch
+Conda
 ```
 conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
 ```
-
+No conda
+```
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+```
 ### Cuda
