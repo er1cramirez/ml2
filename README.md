@@ -73,5 +73,8 @@ cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local -DOPENCV_EX
 ```
 Build
 ```
-cmake --build .
+make -j$(nproc)
+```
+```
+sudo make install
 ```
