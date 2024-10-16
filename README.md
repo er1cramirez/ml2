@@ -33,3 +33,51 @@ No conda
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 ```
 ### Cuda
+
+
+cuDNNN
+```
+wget https://developer.download.nvidia.com/compute/cudnn/9.5.0/local_installers/cudnn-local-repo-ubuntu2004-9.5.0_1.0-1_amd64.deb
+sudo dpkg -i cudnn-local-repo-ubuntu2004-9.5.0_1.0-1_amd64.deb
+sudo cp /var/cudnn-local-repo-ubuntu2004-9.5.0/cudnn-*-keyring.gpg /usr/share/keyrings/
+sudo apt-get update
+sudo apt-get -y install cudnn
+```
+```
+sudo apt-get -y install cudnn-cuda-12
+```
+
+### Opencv Cuda
+Install minimal prerequisites (Ubuntu 18.04 as reference)
+```
+sudo apt update && sudo apt install -y cmake g++ wget unzip
+```
+Download and unpack sources
+```
+wget -O opencv.zip https://github.com/opencv/opencv/archive/4.x.zip
+wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.x.zip
+unzip opencv.zip
+unzip opencv_contrib.zip
+```
+Create build directory and switch into it
+```
+mkdir -p build && cd build
+```
+Configure
+```
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_INSTALL_PREFIX=$(python3 -c "import sys; print(sys.prefix)") \
+      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-4.x/modules ../opencv-4.x
+      -D PYTHON_EXECUTABLE=$(which python) \
+      -D WITH_CUDA=ON \
+      -D ENABLE_FAST_MATH=1 \
+      -D CUDA_FAST_MATH=1 \
+      -D WITH_CUDNN=ON \
+      -D OPENCV_DNN_CUDA=ON \
+      -D BUILD_opencv_python3=ON \
+      -D BUILD_EXAMPLES=ON ..
+```
+Build
+```
+cmake --build .
+```
