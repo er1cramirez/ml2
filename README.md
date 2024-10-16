@@ -1,6 +1,63 @@
+
+# Cuda Install
+
+Get started
+First, verify that you have CUDA-capable NVIDIA hardware. To do this, run the following command and expect an output similar to this one:
+```
+lspci | grep -i nvidia
+```
+```
+sudo apt install linux-headers-$(uname -r)
+```
+```
+sudo apt-get update
+```
+```
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-ubuntu2004-12-4-local_12.4.0-550.54.14-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2004-12-4-local_12.4.0-550.54.14-1_amd64.deb
+sudo cp /var/cuda-repo-ubuntu2004-12-4-local/cuda-*-keyring.gpg /usr/share/keyrings/
+sudo apt-get updatesudo apt-get -y install cuda-toolkit-12-4
+```
+```
+sudo apt-get install -y nvidia-driver-550-open
+sudo apt-get install -y cuda-drivers-550
+```
+```
+sudo reboot
+```
+```
+code ~/.bashrc
+```
+```
+export PATH=/usr/local/cuda-12.4/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-12.4/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+```
+Test the installation
+```
+nvcc — version
+```
+
+
 # ml2
 
-
+$ cmake \
+-D CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \
+-D CUDA_nppicom_LIBRARY=/usr/local/cuda/lib64/libnppicom.so \
+-D CMAKE_BUILD_TYPE=RELEASE \
+-D CMAKE_INSTALL_PREFIX=/usr/local \
+-D WITH_CUDA=ON \
+-D WITH_CUDNN=ON \
+-D WITH_CUBLAS=ON \
+-D WITH_TBB=ON \
+-D OPENCV_DNN_CUDA=ON \
+-D OPENCV_ENABLE_NONFREE=ON \
+-D CUDA_ARCH_BIN=7.5 \
+-D OPENCV_EXTRA_MODULES_PATH=$HOME/opencv_contrib/modules \
+-D BUILD_EXAMPLES=OFF \
+-D HAVE_opencv_python3=ON \
+..
 ## Instalaciones
 
 ### Conda(opcional)
@@ -98,6 +155,8 @@ cd build
 Run CMake with the following flags:
 ```
 cmake \
+-D CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \
+-D CUDA_nppicom_LIBRARY=/usr/local/cuda/lib64/libnppicom.so \
 -D CMAKE_BUILD_TYPE=RELEASE \
 -D CMAKE_INSTALL_PREFIX=/usr/local \
 -D WITH_CUDA=ON \
@@ -106,7 +165,7 @@ cmake \
 -D WITH_TBB=ON \
 -D OPENCV_DNN_CUDA=ON \
 -D OPENCV_ENABLE_NONFREE=ON \
--D CUDA_ARCH_BIN=6.1 \
+-D CUDA_ARCH_BIN=7.5 \
 -D OPENCV_EXTRA_MODULES_PATH=$HOME/opencv_contrib/modules \
 -D BUILD_EXAMPLES=OFF \
 -D HAVE_opencv_python3=ON \
