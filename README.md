@@ -40,6 +40,86 @@ nvcc — version
 ```
 
 
+# Bebop Driver
+```
+sudo apt-get update
+```
+```
+cd ~/
+mkdir -p bebop_ws/src && cd ~/bebop_ws/src
+git clone https://github.com/antonellabarisic/parrot_arsdk.git
+cd parrot_arsdk
+git checkout noetic_dev
+```
+```
+sudo apt-get install libavahi-client-dev
+```
+```
+sudo ln -s /usr/bin/python3 /usr/bin/python
+cd ~/bebop_ws
+catkin_make
+```
+```
+cd src
+git clone https://github.com/AutonomyLab/bebop_autonomy.git
+```
+Modify /bebop_driver/src/bebop_video_decoder.cpp
+- line 93: CODEC_AP_TRUNCATED -> AV_CODEC_CAP_TRUNCATED
+- line 95: CODEC_FLAG_TRUNCATED -> AV_CODEC_FLAG_TRUNCATED
+- line 97: CODEC_FLAG2_CHUNKS -> AV_CODEC_FLAG2_CHUNKS
+
+```
+code ~/bebop_ws/src/bebop_autonomy/bebop_driver/src/bebop_video_decoder.cpp
+```
+```
+if (codec_ptr_->capabilities & AV_CODEC_CAP_TRUNCATED)
+    {
+      codec_ctx_ptr_->flags |= AV_CODEC_FLAG_TRUNCATED;
+    }
+    codec_ctx_ptr_->flags2 |= AV_CODEC_FLAG2_CHUNKS;
+```
+
+Add this line in your ~/.bashrc :
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/bebop_ws/devel/lib/parrot_arsdk
+```
+Install the following:
+```
+sudo apt install ros-noetic-joy ros-noetic-joy-teleop ros-noetic-teleop-twist-joy
+```
+Build:
+```
+cd ..
+catkin_make
+```
+
+# iROS_drone
+```
+cd ~/bebop_ws/src
+sudo apt-get update
+```
+```
+sudo apt install build-essential python3-rosdep python3-catkin-tools
+```
+```
+sudo apt install libusb-dev python3-osrf-pycommon libspnav-dev libbluetooth-dev libcwiid-dev libgoogle-glog-dev
+```
+```
+sudo apt install ros-noetic-mavros ros-noetic-octomap-ros
+```
+```
+git clone https://github.com/ethz-asl/mav_comm
+git clone -b noetic https://github.com/simonernst/iROS_drone
+git clone https://github.com/ros-drivers/joystick_drivers
+cd ..
+catkin_make
+```
+```
+source ~/bebop_ws/devel/setup.bash
+```
+```
+roslaunch rotors_gazebo mav_velocity_control_with_fake_driver.launch
+```
 # ml2
 
 $ cmake \
