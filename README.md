@@ -120,6 +120,16 @@ source ~/bebop_ws/devel/setup.bash
 ```
 roslaunch rotors_gazebo mav_velocity_control_with_fake_driver.launch
 ```
+
+Copy the contents of the models directory to ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/models/
+Copy the contents of the worlds directory to ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/worlds/
+Copy the contents of the launch directory to ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/launch/
+
+```
+cp -r ~/tmr_drones_cimat_2023/models/* ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/models/
+cp -r ~/tmr_drones_cimat_2023/worlds/* ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/worlds/
+cp -r ~/tmr_drones_cimat_2023/launch/* ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/launch/
+```
 # ml2
 
 $ cmake \
