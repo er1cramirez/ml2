@@ -1,4 +1,6 @@
-
+```
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_CUDA=ON -D WITH_CUDNN=ON -D WITH_CUBLAS=ON -D WITH_TBB=ON -D OPENCV_DNN_CUDA=ON -D OPENCV_ENABLE_NONFREE=ON -D CUDA_ARCH_BIN=7.5 -D OPENCV_EXTRA_MODULES_PATH=$HOME/opencv_contrib/modules -D BUILD_EXAMPLES=OFF -D HAVE_opencv_python3=ON ..
+```
 # Cuda Install
 
 Get started
@@ -129,6 +131,11 @@ Copy the contents of the launch directory to ~/bebop_ws/src/iROS_drone/rotors_si
 cp -r ~/tmr_drones_cimat_2023/models/* ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/models/
 cp -r ~/tmr_drones_cimat_2023/worlds/* ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/worlds/
 cp -r ~/tmr_drones_cimat_2023/launch/* ~/bebop_ws/src/iROS_drone/rotors_simulator/rotors_gazebo/launch/
+```
+
+For test
+```
+roslaunch rotors_gazebo first_challenge.launch
 ```
 # ml2
 
