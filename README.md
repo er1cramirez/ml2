@@ -50,6 +50,10 @@ sudo apt-get -y install cudnn-cuda-12
 ### Opencv Cuda
 Install minimal prerequisites (Ubuntu 18.04 as reference)
 ```
+sudo apt-get install build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get install libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+```
+```
 sudo apt update && sudo apt install -y cmake g++ wget unzip
 ```
 Download and unpack sources
