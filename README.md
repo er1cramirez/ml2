@@ -65,17 +65,7 @@ mkdir -p build && cd build
 ```
 Configure
 ```
-cmake -D CMAKE_BUILD_TYPE=RELEASE \
-      -D CMAKE_INSTALL_PREFIX=$(python3 -c "import sys; print(sys.prefix)") \
-      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-4.x/modules ../opencv-4.x
-      -D PYTHON_EXECUTABLE=$(which python) \
-      -D WITH_CUDA=ON \
-      -D ENABLE_FAST_MATH=1 \
-      -D CUDA_FAST_MATH=1 \
-      -D WITH_CUDNN=ON \
-      -D OPENCV_DNN_CUDA=ON \
-      -D BUILD_opencv_python3=ON \
-      -D BUILD_EXAMPLES=ON ..
+cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-4.x/modules ../opencv-4.x -D WITH_CUDA=ON -D CUDA_ARCH_BIN=7.5 -D CUDA_FAST_MATH=ON -D WITH_CUBLAS=ON -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=OFF -D BUILD_EXAMPLES=OFF -D BUILD_opencv_python3=ON -D OPENCV_DNN_CUDA=ON -D OPENCV_ENABLE_NONFREE=ON -D OPENCV_DNN_CUDNN=ON -D PYTHON3_EXECUTABLE=$(which python3) -D PYTHON3_INCLUDE_DIR=$(python3 -c "from sysconfig import get_paths as gp; print(gp()['include'])") -D PYTHON3_LIBRARY=$(python3 -c "from sysconfig import get_config_var; print(get_config_var('LIBDIR'))") -D PYTHON3_PACKAGES_PATH=$(python3 -c "import site; print(site.getsitepackages()[0])") ..
 ```
 Build
 ```
