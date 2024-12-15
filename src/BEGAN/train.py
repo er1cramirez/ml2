@@ -271,7 +271,7 @@ def main():
     g_optimizer = optim.Adam(G.parameters(), lr=0.0001, betas=(0.5, 0.999))
     
     # No necesitamos criterion ya que la pérdida está implementada en train_epoch
-    train(D, G, train_loader, val_loader, d_optimizer, g_optimizer, device)
+    train(D, G, train_loader, val_loader, d_optimizer, g_optimizer, device, epochs=100, checkpoint_freq=5)
 
 if __name__ == '__main__':
     main()
