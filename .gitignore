@@ -6,3 +6,5 @@ generated_samples/
 */.ipynb_checkpoints/
 */.vscode/
 GAN_backup/
+*/out/
+*.pth

@@ -79,4 +79,7 @@ class Generator(nn.Module):
             nn.ConvTranspose2d(64, 3, 4, stride=2, padding=1),
             nn.Tanh()
         )
+    def forward(self, z):
+        z = z.view(-1, self.latent_dim, 1, 1)
+        return self.model(z)
         

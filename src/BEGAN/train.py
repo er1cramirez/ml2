@@ -54,16 +54,23 @@ def train_epoch(D, G, dataloader, d_optimizer, g_optimizer, device, k_t, gamma=0
         g_loss.backward()
         g_optimizer.step()
         
-        # Actualizar k_t
+        # Actualizar k_t usando max y min para limitar entre 0 y 1
         balance = (gamma * d_real_loss - d_fake_loss).item()
         k_t = k_t + lambda_k * balance
-        k_t = k_t.clamp(0, 1)
+        k_t = max(0, min(1, k_t))  # Reemplazamos clamp con max/min
         
         # Medida de convergencia
         M = d_real_loss.item() + abs(balance)
         
         d_epoch_loss += d_loss.item()
         g_epoch_loss += g_loss.item()
+        
+        if batch_idx % 100 == 0:
+            print(f'[Batch {batch_idx}/{len(dataloader)}] '
+                  f'D_loss: {d_loss.item():.4f} '
+                  f'G_loss: {g_loss.item():.4f} '
+                  f'M: {M:.4f} '
+                  f'k_t: {k_t:.4f}')
         
     return d_epoch_loss/len(dataloader), g_epoch_loss/len(dataloader), k_t, M
 
@@ -206,15 +213,15 @@ def train(D, G, train_loader, val_loader, d_optimizer, g_optimizer, device, epoc
               f'k_t: {k_t:.4f}')
         
         if (epoch + 1) % checkpoint_freq == 0:
-            save_checkpoint(D, G, d_optimizer, g_optimizer, epoch, d_loss, g_loss, is_best=False, checkpoint_dir=paths.GAN_CHECKPOINT_DIR)
+            save_checkpoint(D, G, d_optimizer, g_optimizer, epoch, d_loss, g_loss, is_best=False, checkpoint_dir=paths.BEGAN_CHECKPOINT_DIR)
         
         if M < best_M:
             best_M = M
             save_checkpoint(D, G, d_optimizer, g_optimizer, epoch, 
-                          d_loss, g_loss, is_best=True, checkpoint_dir=paths.GAN_CHECKPOINT_DIR)
+                          d_loss, g_loss, is_best=True, checkpoint_dir=paths.BEGAN_CHECKPOINT_DIR)
     
     # save final model
-    save_checkpoint(D, G, d_optimizer, g_optimizer, epoch, d_loss, g_loss, is_best=False, checkpoint_dir=paths.GAN_MODEL_DIR)
+    save_checkpoint(D, G, d_optimizer, g_optimizer, epoch, d_loss, g_loss, is_best=False, checkpoint_dir=paths.BEGAN_MODEL_DIR)
     print("Training complete.")
 
 def get_device():
@@ -230,7 +237,7 @@ def get_device():
     
 def main():
     # Configurar ruta de datos
-    paths.setup_gan_paths()
+    paths.setup_began_paths()
     # Configurar dispositivo
     device = get_device()
     print(f"Using device: {device}")
