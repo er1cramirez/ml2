@@ -46,7 +46,7 @@ def setup_autoencoder_paths():
         os.makedirs(AUTOENCODER_BACKUP_DIR)
 
 # GAN
-GAN_DIR = './GAN'
+GAN_DIR = '/home/eric/ml2/src/GAN'
 GAN_CHECKPOINT_DIR = os.path.join(GAN_DIR, BASE_CHECKPOINT_DIR)
 GAN_MODEL_DIR = os.path.join(GAN_DIR, BASE_MODEL_DIR)
 GAN_BACKUP_DIR = os.path.join(GAN_DIR, BASE_BACKUP_DIR)
@@ -57,6 +57,19 @@ def setup_gan_paths():
         os.makedirs(GAN_MODEL_DIR)
     if not os.path.exists(GAN_BACKUP_DIR):
         os.makedirs(GAN_BACKUP_DIR)
+
+# GAN_FID
+GAN_FID_DIR = '/home/eric/ml2/src/GAN_FID'
+GAN_FID_CHECKPOINT_DIR = os.path.join(GAN_FID_DIR, BASE_CHECKPOINT_DIR)
+GAN_FID_MODEL_DIR = os.path.join(GAN_FID_DIR, BASE_MODEL_DIR)
+GAN_FID_BACKUP_DIR = os.path.join(GAN_FID_DIR, BASE_BACKUP_DIR)
+def setup_gan_fid_paths():
+    if not os.path.exists(GAN_FID_CHECKPOINT_DIR):
+        os.makedirs(GAN_FID_CHECKPOINT_DIR)
+    if not os.path.exists(GAN_FID_MODEL_DIR):
+        os.makedirs(GAN_FID_MODEL_DIR)
+    if not os.path.exists(GAN_FID_BACKUP_DIR):
+        os.makedirs(GAN_FID_BACKUP_DIR)
 
 # CGAN
 CGAN_DIR = './CGAN'

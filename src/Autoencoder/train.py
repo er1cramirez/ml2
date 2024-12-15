@@ -11,79 +11,10 @@ src_path = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(src_path)
 import utils.lfw_dataset_handler as lfw
 import paths_config as paths
+
+from model import ConvAutoencoder
 # import src.paths_config as paths
 
-
-# Definir modelo
-class ConvAutoencoder(nn.Module):
-    """
-    Autoencoder Convolucional para Rostros
-    =====================================
-    
-    Arquitectura del modelo:
-    
-    Encoder:
-    --------
-    1. Input (3, 128, 128) -> Conv2d -> (32, 64, 64)   [Reducción espacial: 128->64]
-    2. (32, 64, 64) -> Conv2d -> (64, 32, 32)          [Reducción espacial: 64->32]
-    3. (64, 32, 32) -> Conv2d -> (128, 16, 16)         [Reducción espacial: 32->16]
-    4. (128, 16, 16) -> Conv2d -> (256, 8, 8)          [Reducción espacial: 16->8]
-    
-    La dimensión del espacio latente es: 256 * 8 * 8 = 16,384
-    
-    Decoder:
-    --------
-    Proceso inverso usando ConvTranspose2d para upsampling
-    """
-    def __init__(self):
-        super(ConvAutoencoder, self).__init__()
-        
-        # Encoder
-        self.encoder = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2)
-        )
-        
-        # Decoder
-        self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),
-            nn.ReLU(),
-            
-            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),
-            nn.ReLU(),
-            
-            nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2),
-            nn.ReLU(),
-            
-            nn.ConvTranspose2d(32, 3, kernel_size=2, stride=2),
-            nn.Sigmoid()
-        )
-
-
-    def forward(self, x):
-        """
-        Forward pass del modelo.
-        
-        Proceso:
-        1. La imagen pasa por el encoder -> representación comprimida
-        2. La representación comprimida pasa por el decoder -> reconstrucción
-        """
-        encoded = self.encoder(x)
-        decoded = self.decoder(encoded)
-        return decoded
 
 def train_epoch(model, dataloader, criterion, optimizer, device):
     """
@@ -224,8 +155,12 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs=
             model, optimizer, start_epoch, best_val_loss = load_checkpoint(model, optimizer, f"{paths.AUTOENCODER_CHECKPOINT_DIR}/best_model.pth")
             print(f"Loaded best model from epoch {start_epoch}")
         else:
-            model, optimizer, start_epoch, best_val_loss = load_checkpoint(model, optimizer, f"{paths.AUTOENCODER_CHECKPOINT_DIR}/checkpoint_{epochs-1}.pth")
-            print(f"Loaded model from epoch {start_epoch}")
+            # load last checkpoint
+            files = os.listdir(paths.AUTOENCODER_CHECKPOINT_DIR)
+            checkpoint_files = [file for file in files if file.startswith("checkpoint")]
+            last_checkpoint = sorted(checkpoint_files, key=lambda x: int(x.split("_")[1].split(".")[0]))[-1]
+            model, optimizer, start_epoch, best_val_loss = load_checkpoint(model, optimizer, f"{paths.AUTOENCODER_CHECKPOINT_DIR}/{last_checkpoint}")
+            print(f"Loaded last model from epoch {start_epoch}")
     else:
         os.makedirs(paths.AUTOENCODER_CHECKPOINT_DIR)
         start_epoch = 0
@@ -289,7 +224,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     # Entrenar modelo
-    train(model, train_loader, val_loader, criterion, optimizer, device, epochs=30, checkpoint_freq=5)
+    train(model, train_loader, val_loader, criterion, optimizer, device, epochs=50, checkpoint_freq=5)
 
 if __name__ == '__main__':
     main()
