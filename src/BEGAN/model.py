@@ -1,74 +1,82 @@
 import torch
 import torch.nn as nn
 
-# Definir modelo
-class ConvAutoencoder(nn.Module):
-    """
-    Autoencoder Convolucional para Rostros
-    =====================================
-    
-    Arquitectura del modelo:
-    
-    Encoder:
-    --------
-    1. Input (3, 128, 128) -> Conv2d -> (32, 64, 64)   [Reducción espacial: 128->64]
-    2. (32, 64, 64) -> Conv2d -> (64, 32, 32)          [Reducción espacial: 64->32]
-    3. (64, 32, 32) -> Conv2d -> (128, 16, 16)         [Reducción espacial: 32->16]
-    4. (128, 16, 16) -> Conv2d -> (256, 8, 8)          [Reducción espacial: 16->8]
-    
-    La dimensión del espacio latente es: 256 * 8 * 8 = 16,384
-    
-    Decoder:
-    --------
-    Proceso inverso usando ConvTranspose2d para upsampling
-    """
-    def __init__(self):
-        super(ConvAutoencoder, self).__init__()
+
+"""
+Módulo Discriminador
+-------------------
+Arquitectura convolucional que evalúa si una imagen es real o generada:
+- Entrada: Imágenes RGB 64x64
+- Capas intermedias: Convoluciones con stride=2 que reducen dimensionalidad
+- BatchNorm y LeakyReLU para estabilidad y no-linealidad
+- Salida: Probabilidad de que la imagen sea real (0-1)
+"""
+class Discriminator(nn.Module):
+    def __init__(self, hidden_size=64, embedding_size=64):
+        super(Discriminator, self).__init__()
         
         # Encoder
         self.encoder = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2)
+            nn.Conv2d(3, hidden_size, 3, stride=2, padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(hidden_size, 2*hidden_size, 3, stride=2, padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(2*hidden_size, 3*hidden_size, 3, stride=2, padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(3*hidden_size, 4*hidden_size, 3, stride=2, padding=1),
+            nn.LeakyReLU(0.2, inplace=True)
         )
         
-        # Decoder
+        # Decoder 
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),
-            nn.ReLU(),
-            
-            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),
-            nn.ReLU(),
-            
-            nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2),
-            nn.ReLU(),
-            
-            nn.ConvTranspose2d(32, 3, kernel_size=2, stride=2),
-            nn.Sigmoid()
+            nn.ConvTranspose2d(4*hidden_size, 3*hidden_size, 3, stride=2, padding=1, output_padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.ConvTranspose2d(3*hidden_size, 2*hidden_size, 3, stride=2, padding=1, output_padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.ConvTranspose2d(2*hidden_size, hidden_size, 3, stride=2, padding=1, output_padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.ConvTranspose2d(hidden_size, 3, 3, stride=2, padding=1, output_padding=1),
+            nn.Tanh()
         )
-
 
     def forward(self, x):
-        """
-        Forward pass del modelo.
-        
-        Proceso:
-        1. La imagen pasa por el encoder -> representación comprimida
-        2. La representación comprimida pasa por el decoder -> reconstrucción
-        """
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
         return decoded
 
+"""
+Módulo Generador
+---------------
+Arquitectura que transforma ruido aleatorio en imágenes:
+- Entrada: Vector de ruido latent_dim-dimensional
+- Capas intermedias: Convoluciones transpuestas que aumentan dimensionalidad
+- BatchNorm y ReLU para estabilidad y no-linealidad
+- Salida: Imágenes RGB 64x64 con valores en [-1,1]
+"""
+
+class Generator(nn.Module):
+    def __init__(self):
+        super(Generator, self).__init__()
+        self.latent_dim = 100
+        def generator_block(in_channels, out_channels, normalize=True):
+            """Bloque básico del generador"""
+            layers = [nn.ConvTranspose2d(in_channels, out_channels, 4, stride=2, padding=1)]
+            if normalize:
+                layers.append(nn.BatchNorm2d(out_channels))
+            layers.append(nn.ReLU(inplace=True))
+            return layers
+
+        self.model = nn.Sequential(
+            # Primera capa - proyección y reshape del vector latente
+            nn.ConvTranspose2d(self.latent_dim, 512, 4, stride=1, padding=0),
+            nn.BatchNorm2d(512),
+            nn.ReLU(inplace=True),
+            # Capas de upsampling
+            *generator_block(512, 256),
+            *generator_block(256, 128),
+            *generator_block(128, 64),
+            # Capa final
+            nn.ConvTranspose2d(64, 3, 4, stride=2, padding=1),
+            nn.Tanh()
+        )
+        

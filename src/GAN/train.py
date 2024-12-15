@@ -193,8 +193,8 @@ def train(D, G, train_loader, val_loader, criterion, d_optimizer, g_optimizer, d
                 start_epoch = 0
             else:
                 last_checkpoint = sorted(checkpoint_files)[-1]
-                G, g_optimizer, start_epoch, best_G_loss = load_checkpoint(G, g_optimizer, f"{paths.GAN_CHECKPOINT_DIR}/{last_checkpoint}")
-                D, d_optimizer, _, best_D_loss = load_checkpoint(D, d_optimizer, f"{paths.GAN_CHECKPOINT_DIR}/{last_checkpoint}")
+                G, g_optimizer, start_epoch, _ = load_checkpoint(G, g_optimizer, f"{paths.GAN_CHECKPOINT_DIR}/{last_checkpoint}")
+                D, d_optimizer, _, _ = load_checkpoint(D, d_optimizer, f"{paths.GAN_CHECKPOINT_DIR}/{last_checkpoint}")
                 print(f"Loaded last model from epoch {start_epoch}")
     else:
         os.makedirs(paths.GAN_CHECKPOINT_DIR)
@@ -214,7 +214,7 @@ def train(D, G, train_loader, val_loader, criterion, d_optimizer, g_optimizer, d
 
         # Proponer un criterio de evaluación que considere tanto la pérdida del discriminador como del generador
         # Por ejemplo, una que considere la diferencia entre ambas pérdidas y la pérdida total
-        metric = 2*abs(d_loss - g_loss) + d_loss + g_loss
+        metric = 4*abs(d_loss - g_loss) + d_loss + g_loss
         
         if metric < best_metric:
             best_metric = metric

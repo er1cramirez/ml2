@@ -85,7 +85,7 @@ def setup_cgan_paths():
         os.makedirs(CGAN_BACKUP_DIR)
 
 # BEGAN
-BEGAN_DIR = './BEGAN'
+BEGAN_DIR = '/home/eric/ml2/src/BEGAN'
 BEGAN_CHECKPOINT_DIR = os.path.join(BEGAN_DIR, BASE_CHECKPOINT_DIR)
 BEGAN_MODEL_DIR = os.path.join(BEGAN_DIR, BASE_MODEL_DIR)
 BEGAN_BACKUP_DIR = os.path.join(BEGAN_DIR, BASE_BACKUP_DIR)
